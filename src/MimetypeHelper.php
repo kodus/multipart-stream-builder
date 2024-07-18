@@ -14,7 +14,7 @@ interface MimetypeHelper
      *
      * @return string|null
      */
-    public function getMimetypeFromFilename($filename);
+    public function getMimetypeFromFilename(string $filename): ?string;
 
     /**
      * Maps a file extensions to a mimetype.
@@ -23,5 +23,5 @@ interface MimetypeHelper
      *
      * @return string|null
      */
-    public function getMimetypeFromExtension($extension);
+    public function getMimetypeFromExtension(string $extension): ?string;
 }

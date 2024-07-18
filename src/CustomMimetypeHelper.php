@@ -10,9 +10,9 @@ namespace Http\Message\MultipartStream;
 class CustomMimetypeHelper extends ApacheMimetypeHelper
 {
     /**
-     * @var array
+     * @var array<string, string>
      */
-    private $mimetypes = [];
+    private array $mimetypes = [];
 
     /**
      * @param array $mimetypes should be of type extension => mimetype
@@ -28,7 +28,7 @@ class CustomMimetypeHelper extends ApacheMimetypeHelper
      *
      * @return $this
      */
-    public function addMimetype($extension, $mimetype)
+    public function addMimetype(string $extension, string $mimetype): self
     {
         $this->mimetypes[$extension] = $mimetype;
 
@@ -40,12 +40,10 @@ class CustomMimetypeHelper extends ApacheMimetypeHelper
      *
      * Check if we have any defined mimetypes and of not fallback to ApacheMimetypeHelper
      */
-    public function getMimetypeFromExtension($extension)
+    public function getMimetypeFromExtension(string $extension): string
     {
         $extension = strtolower($extension);
 
-        return isset($this->mimetypes[$extension])
-            ? $this->mimetypes[$extension]
-            : parent::getMimetypeFromExtension($extension);
+        return $this->mimetypes[$extension] ?? parent::getMimetypeFromExtension($extension);
     }
 }

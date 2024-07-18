@@ -1,14 +1,11 @@
-# PSR-7 Multipart Stream Builder
+PSR-7 Multipart Stream Builder
+==============================
 
-[![Latest Version](https://img.shields.io/github/release/php-http/multipart-stream-builder.svg?style=flat-square)](https://github.com/php-http/multipart-stream-builder/releases)
+[![Latest Version](https://img.shields.io/github/release/kodus/multipart-stream-builder.svg?style=flat-square)](https://github.com/kodus/multipart-stream-builder/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
-[![Build Status](https://github.com/php-http/multipart-stream-builder/actions/workflows/tests.yml/badge.svg)](https://github.com/php-http/multipart-stream-builder/actions/workflows/tests.yml)
-[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/php-http/multipart-stream-builder.svg?style=flat-square)](https://scrutinizer-ci.com/g/php-http/multipart-stream-builder)
-[![Quality Score](https://img.shields.io/scrutinizer/g/php-http/multipart-stream-builder.svg?style=flat-square)](https://scrutinizer-ci.com/g/php-http/multipart-stream-builder)
-[![Total Downloads](https://img.shields.io/packagist/dt/php-http/multipart-stream-builder.svg?style=flat-square)](https://packagist.org/packages/php-http/multipart-stream-builder)
+[![Build Status](https://github.com/kodus/multipart-stream-builder/actions/workflows/tests.yml/badge.svg)](https://github.com/php-http/multipart-stream-builder/actions/workflows/tests.yml)
 
 **A builder for Multipart PSR-7 Streams. The builder create streams independenly form any PSR-7 implementation.**
-
 
 ## Install
 

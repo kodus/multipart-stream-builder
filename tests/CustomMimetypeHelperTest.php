@@ -9,7 +9,7 @@ class CustomMimetypeHelperTest extends TestCase
 {
     public function testGetMimetypeFromExtension()
     {
-        $helper = new CustomMimetypeHelper(['foo'=>'foo/bar']);
+        $helper = new CustomMimetypeHelper(['foo' => 'foo/bar']);
         $this->assertEquals('foo/bar', $helper->getMimetypeFromExtension('foo'));
 
         $this->assertEquals('application/x-rar-compressed', $helper->getMimetypeFromExtension('rar'));

@@ -2,7 +2,6 @@
 
 namespace tests\Http\Message\MultipartStream;
 
-use Http\Message\MultipartStream\CustomMimetypeHelper;
 use Http\Message\MultipartStream\MultipartStreamBuilder;
 use Nyholm\Psr7\Factory\HttplugFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -15,27 +14,27 @@ use Psr\Http\Message\StreamInterface;
  */
 class FunctionTest extends TestCase
 {
-    public function testSupportStreams()
+    public function testSupportStreams(): void
     {
         $body = 'stream contents';
 
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $builder->addResource('foobar', $this->createStream($body));
 
         $multipartStream = (string) $builder->build();
-        $this->assertTrue(false !== strpos($multipartStream, $body));
+        $this->assertTrue(str_contains($multipartStream, $body));
     }
 
-    public function testSupportResources()
+    public function testSupportResources(): void
     {
-        $resource = fopen(__DIR__.'/Resources/httplug.png', 'r');
+        $resource = fopen(__DIR__ . '/Resources/httplug.png', 'r');
 
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $builder->addResource('image', $resource);
 
         $multipartStream = (string) $builder->build();
-        $this->assertTrue(false !== strpos($multipartStream, 'Content-Disposition: form-data; name="image"; filename="httplug.png"'));
-        $this->assertTrue(false !== strpos($multipartStream, 'Content-Type: image/png'));
+        $this->assertTrue(str_contains($multipartStream, 'Content-Disposition: form-data; name="image"; filename="httplug.png"'));
+        $this->assertTrue(str_contains($multipartStream, 'Content-Type: image/png'));
     }
 
     public function testSupportURIResources()
@@ -43,18 +42,18 @@ class FunctionTest extends TestCase
         $url = 'https://raw.githubusercontent.com/php-http/multipart-stream-builder/1.x/tests/Resources/httplug.png';
         $resource = fopen($url, 'r');
 
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $builder->addResource('image', $resource);
         $multipartStream = (string) $builder->build();
 
-        $this->assertTrue(false !== strpos($multipartStream, 'Content-Disposition: form-data; name="image"; filename="httplug.png"'));
-        $this->assertTrue(false !== strpos($multipartStream, 'Content-Type: image/png'));
+        $this->assertTrue(str_contains($multipartStream, 'Content-Disposition: form-data; name="image"; filename="httplug.png"'));
+        $this->assertTrue(str_contains($multipartStream, 'Content-Type: image/png'));
 
         $urlContents = file_get_contents($url);
         $this->assertStringContainsString($urlContents, $multipartStream);
     }
 
-    public function testResourceFilenameIsNotLocaleAware()
+    public function testResourceFilenameIsNotLocaleAware(): void
     {
         // Get current locale
         $originalLocale = setlocale(LC_ALL, "0");
@@ -62,9 +61,9 @@ class FunctionTest extends TestCase
         // Set locale to something strange.
         setlocale(LC_ALL, 'C');
 
-        $resource = fopen(__DIR__.'/Resources/httplug.png', 'r');
-        $builder = new MultipartStreamBuilder();
-        $builder->addResource('image', $resource, ['filename'=> 'äa.png']);
+        $resource = fopen(__DIR__ . '/Resources/httplug.png', 'r');
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
+        $builder->addResource('image', $resource, ['filename' => 'äa.png']);
 
         $multipartStream = (string) $builder->build();
         $this->assertTrue(0 < preg_match('|filename="([^"]*?)"|si', $multipartStream, $matches), 'Could not find any filename in output.');
@@ -74,53 +73,53 @@ class FunctionTest extends TestCase
         setlocale(LC_ALL, $originalLocale);
     }
 
-    public function testHeaders()
+    public function testHeaders(): void
     {
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $builder->addResource('foobar', 'stream contents', ['headers' => ['Content-Type' => 'html/image', 'content-length' => '4711', 'CONTENT-DISPOSITION' => 'none']]);
 
         $multipartStream = (string) $builder->build();
-        $this->assertTrue(false !== strpos($multipartStream, 'Content-Type: html/image'));
-        $this->assertTrue(false !== strpos($multipartStream, 'content-length: 4711'));
-        $this->assertTrue(false !== strpos($multipartStream, 'CONTENT-DISPOSITION: none'));
+        $this->assertTrue(str_contains($multipartStream, 'Content-Type: html/image'));
+        $this->assertTrue(str_contains($multipartStream, 'content-length: 4711'));
+        $this->assertTrue(str_contains($multipartStream, 'CONTENT-DISPOSITION: none'));
 
         // Make sure we do not add extra headers with a different case
-        $this->assertTrue(false === strpos($multipartStream, 'Content-Disposition:'));
+        $this->assertFalse(str_contains($multipartStream, 'Content-Disposition:'));
     }
 
-    public function testContentLength()
+    public function testContentLength(): void
     {
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $builder->addResource('foobar', 'stream contents');
 
         $multipartStream = (string) $builder->build();
-        $this->assertTrue(false !== strpos($multipartStream, 'Content-Length: 15'));
+        $this->assertTrue(str_contains($multipartStream, 'Content-Length: 15'));
     }
 
-    public function testFormName()
+    public function testFormName(): void
     {
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $builder->addResource('a-formname', 'string');
 
         $multipartStream = (string) $builder->build();
-        $this->assertTrue(false !== strpos($multipartStream, 'Content-Disposition: form-data; name="a-formname"'));
+        $this->assertTrue(str_contains($multipartStream, 'Content-Disposition: form-data; name="a-formname"'));
     }
 
-    public function testAddResourceWithSameName()
+    public function testAddResourceWithSameName(): void
     {
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $builder->addResource('name', 'foo1234567890foo');
         $builder->addResource('name', 'bar1234567890bar');
 
         $multipartStream = (string) $builder->build();
-        $this->assertTrue(false !== strpos($multipartStream, 'bar1234567890bar'));
-        $this->assertTrue(false !== strpos($multipartStream, 'foo1234567890foo'), 'Using same name must not overwrite');
+        $this->assertTrue(str_contains($multipartStream, 'bar1234567890bar'));
+        $this->assertTrue(str_contains($multipartStream, 'foo1234567890foo'), 'Using same name must not overwrite');
     }
 
-    public function testBoundary()
+    public function testBoundary(): void
     {
         $boundary = 'SpecialBoundary';
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $builder->addResource('content0', 'string');
         $builder->setBoundary($boundary);
 
@@ -135,10 +134,10 @@ class FunctionTest extends TestCase
         $this->assertEquals(5, substr_count($multipartStream, $boundary));
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $boundary = 'SpecialBoundary';
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $builder->addResource('content0', 'foobar');
         $builder->setBoundary($boundary);
 
@@ -149,47 +148,38 @@ class FunctionTest extends TestCase
         $this->assertNotEmpty($builder->getBoundary());
     }
 
-    public function testThrowsExceptionIfNotStreamCompatible()
+    public function testThrowsExceptionIfNotStreamCompatible(): void
     {
-        $builder = new MultipartStreamBuilder();
+        $builder = new MultipartStreamBuilder(new Psr17Factory());
         $this->expectException(\InvalidArgumentException::class);
         $builder->addResource('foo', []);
-    }
-
-    public function testThrowsExceptionInConstructor()
-    {
-        $this->expectException(\LogicException::class);
-        new MultipartStreamBuilder(new CustomMimetypeHelper());
     }
 
     /**
      * @dataProvider getStreamFactories
      */
-    public function testSupportDifferentFactories($factory)
+    public function testSupportDifferentFactories($factory): void
     {
-        $resource = fopen(__DIR__.'/Resources/httplug.png', 'r');
+        $resource = fopen(__DIR__ . '/Resources/httplug.png', 'r');
 
         $builder = new MultipartStreamBuilder($factory);
         $builder->addResource('image', $resource);
 
         $multipartStream = (string) $builder->build();
-        $this->assertTrue(false !== strpos($multipartStream, 'Content-Disposition: form-data; name="image"; filename="httplug.png"'));
-        $this->assertTrue(false !== strpos($multipartStream, 'Content-Type: image/png'));
-    }
-
-    public function getStreamFactories()
-    {
-        yield 'Httplug Stream Factory' => [new HttplugFactory()];
-        yield 'PSR-17 Stream Factory' => [new Psr17Factory()];
-        yield 'Null Stream Factory' => [null];
+        $this->assertTrue(str_contains($multipartStream, 'Content-Disposition: form-data; name="image"; filename="httplug.png"'));
+        $this->assertTrue(str_contains($multipartStream, 'Content-Type: image/png'));
     }
 
     /**
-     * @param string $body
-     *
-     * @return StreamInterface
+     * @return iterable<string, string>
      */
-    private function createStream($body)
+    public function getStreamFactories(): iterable
+    {
+        yield 'Httplug Stream Factory' => [new HttplugFactory()];
+        yield 'PSR-17 Stream Factory' => [new Psr17Factory()];
+    }
+
+    private function createStream(string $body): StreamInterface
     {
         $stream = Stream::create($body);
         $stream->rewind();
